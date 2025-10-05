@@ -1,6 +1,8 @@
 module Main (main) where
 
+import qualified Lexer.Test as Lexer
+import Test.Tasty (defaultMain, testGroup)
 import Prelude (IO, putStrLn)
 
 main :: IO ()
-main = putStrLn "Test suite not yet implemented."
+main = defaultMain $ testGroup "All Tests" [Lexer.test]

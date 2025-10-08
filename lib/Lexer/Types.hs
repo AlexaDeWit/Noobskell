@@ -45,3 +45,4 @@ data Token
   , tokenLiteral :: Maybe Text
   , tokenLine :: Int
   }
+  deriving (Eq, Show)

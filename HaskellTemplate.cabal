@@ -48,7 +48,10 @@ library
   -- Import common warning flags.
   import: warnings
   -- Modules exported by the library.
-  exposed-modules: MyLib
+  exposed-modules:
+    Lexer.Types
+    MyLib
+
   -- Modules included in this library but not exported.
   -- other-modules:
   -- LANGUAGE extensions used by modules in this package.
@@ -129,6 +132,9 @@ test-suite Noobskell-test
 
   other-extensions:
     OverloadedStrings
+
+  other-modules:
+    Lexer.Test
 
   -- The entrypoint to the test suite.
   main-is: Main.hs

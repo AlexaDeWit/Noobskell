@@ -49,6 +49,7 @@ library
   import: warnings
   -- Modules exported by the library.
   exposed-modules:
+    Lexer.Scanning
     Lexer.Types
     MyLib
 
@@ -60,6 +61,7 @@ library
   build-depends:
     base >=4.9 && <5,
     bytestring,
+    containers,
     dotenv,
     lens,
     newtype,

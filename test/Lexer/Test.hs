@@ -22,4 +22,18 @@ singleCharacterTokens =
         pure (LexTypes.initToken LexTypes.RIGHT_PAREN ")") @=? LS.scanTokens ")"
     , testCase "Left Brace" $ do
         pure (LexTypes.initToken LexTypes.LEFT_BRACE "{") @=? LS.scanTokens "{"
+    , testCase "Right Brace" $ do
+        pure (LexTypes.initToken LexTypes.RIGHT_BRACE "}") @=? LS.scanTokens "}"
+    , testCase "Comma" $ do
+        pure (LexTypes.initToken LexTypes.COMMA ",") @=? LS.scanTokens ","
+    , testCase "Dot" $ do
+        pure (LexTypes.initToken LexTypes.DOT ".") @=? LS.scanTokens "."
+    , testCase "Minus" $ do
+        pure (LexTypes.initToken LexTypes.MINUS "-") @=? LS.scanTokens "-"
+    , testCase "Plus" $ do
+        pure (LexTypes.initToken LexTypes.PLUS "+") @=? LS.scanTokens "+"
+    , testCase "Semicolon" $ do
+        pure (LexTypes.initToken LexTypes.SEMICOLON ";") @=? LS.scanTokens ";"
+    , testCase "Star" $ do
+        pure (LexTypes.initToken LexTypes.STAR "*") @=? LS.scanTokens "*"
     ]

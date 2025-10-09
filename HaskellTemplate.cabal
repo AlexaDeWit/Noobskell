@@ -72,10 +72,9 @@ library
   -- LANGUAGE extensions used by modules in this package by default.
   default-extensions:
     NoImplicitPrelude
-
-  other-extensions:
     OverloadedStrings
 
+  other-extensions:
   -- Directories containing source files.
   hs-source-dirs: lib
   -- Base language which the package is written in.
@@ -107,10 +106,9 @@ executable Noobskell
   -- LANGUAGE extensions used by modules in this package by default.
   default-extensions:
     NoImplicitPrelude
-
-  other-extensions:
     OverloadedStrings
 
+  other-extensions:
   ghc-options:
     -Wall
     -Werror
@@ -131,10 +129,9 @@ test-suite Noobskell-test
   -- LANGUAGE extensions used by modules in this package by default.
   default-extensions:
     NoImplicitPrelude
-
-  other-extensions:
     OverloadedStrings
 
+  other-extensions:
   other-modules:
     Lexer.Test
 

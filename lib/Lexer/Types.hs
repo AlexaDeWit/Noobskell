@@ -1,6 +1,6 @@
 module Lexer.Types where
 
-import Protolude (Eq, Int, Maybe, Show, Text)
+import Protolude (Eq, Int, Maybe (..), Show, Text)
 
 data TokenType
   = -- Single-character tokens.
@@ -44,5 +44,15 @@ data Token
   , tokenLexeme :: Text
   , tokenLiteral :: Maybe Text
   , tokenLine :: Int
+  -- ^ Line numbers are 1-indexed to fit with natural reading patterns
   }
   deriving (Eq, Show)
+
+initToken :: TokenType -> Text -> Token
+initToken tType lexeme =
+  Token
+    { tokenType = tType
+    , tokenLexeme = lexeme
+    , tokenLiteral = Nothing
+    , tokenLine = 1
+    }

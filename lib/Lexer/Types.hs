@@ -1,5 +1,6 @@
 module Lexer.Types where
 
+import qualified Data.Sequence as Seq
 import Protolude (Eq, Int, Maybe (..), Show, Text)
 
 data TokenType
@@ -55,4 +56,33 @@ initToken tType lexeme =
     , tokenLexeme = lexeme
     , tokenLiteral = Nothing
     , tokenLine = 1
+    }
+
+data ScanningError
+  = ScanningError
+  { scanningErrorStart :: Int
+  , scanningErrorEnd :: Int
+  , scanningErrorText :: Text
+  }
+  deriving (Eq, Show)
+
+makeScanningError :: Int -> Int -> Text -> ScanningError
+makeScanningError start end text =
+  ScanningError
+    { scanningErrorStart = start
+    , scanningErrorEnd = end
+    , scanningErrorText = text
+    }
+
+data ScanResult = ScanResult
+  { scanResultTokens :: Seq.Seq Token
+  , scanResultErrors :: Seq.Seq ScanningError
+  }
+  deriving (Eq, Show)
+
+initScanResult :: ScanResult
+initScanResult =
+  ScanResult
+    { scanResultTokens = Seq.empty
+    , scanResultErrors = Seq.empty
     }

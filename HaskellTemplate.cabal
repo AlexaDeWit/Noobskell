@@ -144,3 +144,4 @@ test-suite Noobskell-test
     protolude >=0.3.5 && <0.4,
     tasty,
     tasty-hunit,
+    containers,

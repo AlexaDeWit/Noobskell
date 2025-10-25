@@ -14,7 +14,7 @@ scanTokens :: Text.Text -> Seq.Seq Token
 scanTokens = LexTypes.scanResultTokens . scan
 
 scan :: Text.Text -> LexTypes.ScanResult
-scan = Text.foldr reducer LexTypes.initScanResult
+scan = Text.foldl reducer LexTypes.initScanResult
 
 addToken :: LexTypes.Token -> LexTypes.ScanResult -> LexTypes.ScanResult
 addToken token result =
@@ -31,8 +31,8 @@ tokenOf tType lexeme scanResult =
     , LexTypes.tokenLine = LexTypes.lineNumber (LexTypes.currentContext scanResult)
     }
 
-reducer :: Char -> LexTypes.ScanResult -> LexTypes.ScanResult
-reducer c acc = case c of
+reducer :: LexTypes.ScanResult -> Char -> LexTypes.ScanResult
+reducer acc c = case c of
   '\n' -> acc{LexTypes.currentContext = (LexTypes.currentContext acc){LexTypes.lineNumber = LexTypes.lineNumber (LexTypes.currentContext acc) + 1}}
   '(' -> addToken (tokenOf LexTypes.LEFT_PAREN "(" acc) acc
   ')' -> addToken (tokenOf LexTypes.RIGHT_PAREN ")" acc) acc

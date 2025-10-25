@@ -1,12 +1,12 @@
 module Lexer.Scanning where
 
 import Data.Char
-import Data.Sequence ((|>))
+import Data.Sequence ((><))
 import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
 import Lexer.Types (Token)
 import qualified Lexer.Types as LexTypes
-import Protolude (Maybe (..), (+), (.))
+import Protolude (Maybe (..), pure, (.))
 
 -- Placeholder implementation
 -- Actual scanning logic to be implemented
@@ -14,13 +14,12 @@ scanTokens :: Text.Text -> Seq.Seq Token
 scanTokens = LexTypes.scanResultTokens . scan
 
 scan :: Text.Text -> LexTypes.ScanResult
-scan = Text.foldl reducer LexTypes.initScanResult
-
-addToken :: LexTypes.Token -> LexTypes.ScanResult -> LexTypes.ScanResult
-addToken token result =
-  result
-    { LexTypes.scanResultTokens = LexTypes.scanResultTokens result |> token
-    }
+scan text =
+  -- A final pass on the reconciliation to avoid the off-by-one error
+  -- due to the fact that it is in a sense a "lookahead" system
+  reconcile scanningResult
+ where
+  scanningResult = Text.foldl reducer LexTypes.initScanResult text
 
 tokenOf :: LexTypes.TokenType -> Text.Text -> LexTypes.ScanResult -> LexTypes.Token
 tokenOf tType lexeme scanResult =
@@ -31,17 +30,36 @@ tokenOf tType lexeme scanResult =
     , LexTypes.tokenLine = LexTypes.lineNumber (LexTypes.currentContext scanResult)
     }
 
+reconcile :: LexTypes.ScanResult -> LexTypes.ScanResult
+reconcile scanResult =
+  scanResult
+    { LexTypes.scanResultTokens = existingTokens >< newTokens
+    }
+ where
+  existingTokens = LexTypes.scanResultTokens scanResult
+  LexTypes.RefinementResult newTokens _ = LexTypes.scanResultRefinementResult scanResult
+
 reducer :: LexTypes.ScanResult -> Char -> LexTypes.ScanResult
-reducer acc c = case c of
-  '\n' -> acc{LexTypes.currentContext = (LexTypes.currentContext acc){LexTypes.lineNumber = LexTypes.lineNumber (LexTypes.currentContext acc) + 1}}
-  '(' -> addToken (tokenOf LexTypes.LEFT_PAREN "(" acc) acc
-  ')' -> addToken (tokenOf LexTypes.RIGHT_PAREN ")" acc) acc
-  '{' -> addToken (tokenOf LexTypes.LEFT_BRACE "{" acc) acc
-  '}' -> addToken (tokenOf LexTypes.RIGHT_BRACE "}" acc) acc
-  ',' -> addToken (tokenOf LexTypes.COMMA "," acc) acc
-  '.' -> addToken (tokenOf LexTypes.DOT "." acc) acc
-  '-' -> addToken (tokenOf LexTypes.MINUS "-" acc) acc
-  '+' -> addToken (tokenOf LexTypes.PLUS "+" acc) acc
-  ';' -> addToken (tokenOf LexTypes.SEMICOLON ";" acc) acc
-  '*' -> addToken (tokenOf LexTypes.STAR "*" acc) acc
-  _ -> acc
+reducer acc c =
+  reconciled
+    { LexTypes.scanResultRefinementResult = nextRefinement
+    }
+ where
+  reconciled = reconcile acc
+  LexTypes.RefinementResult _ furtherRefinement = LexTypes.scanResultRefinementResult acc
+  nextRefinement = case furtherRefinement of
+    Just refineFunc -> refineFunc c
+    Nothing -> newRefinement
+  newRefinement =
+    case c of
+      '(' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.LEFT_PAREN "(" acc)) Nothing
+      ')' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.RIGHT_PAREN ")" acc)) Nothing
+      '{' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.LEFT_BRACE "{" acc)) Nothing
+      '}' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.RIGHT_BRACE "}" acc)) Nothing
+      ',' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.COMMA "," acc)) Nothing
+      '.' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.DOT "." acc)) Nothing
+      '-' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.MINUS "-" acc)) Nothing
+      '+' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.PLUS "+" acc)) Nothing
+      ';' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.SEMICOLON ";" acc)) Nothing
+      '*' -> LexTypes.RefinementResult (pure (tokenOf LexTypes.STAR "*" acc)) Nothing
+      _ -> LexTypes.RefinementResult Seq.Empty Nothing

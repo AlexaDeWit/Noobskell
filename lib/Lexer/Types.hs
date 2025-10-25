@@ -74,11 +74,7 @@ makeScanningError start end text =
     , scanningErrorText = text
     }
 
-data RefinementResult
-  = NoResult
-  | TokenResult Token
-  | ErrorResult ScanningError
-  | FurtherRefinement (Char -> RefinementResult)
+data RefinementResult = RefinementResult (Seq.Seq Token) (Maybe (Char -> RefinementResult))
 
 data ScanResultContext = ScanResultContext
   { lineNumber :: Int
@@ -87,7 +83,7 @@ data ScanResultContext = ScanResultContext
 data ScanResult = ScanResult
   { scanResultTokens :: Seq.Seq Token
   , scanResultErrors :: Seq.Seq ScanningError
-  , scanResultLast :: RefinementResult
+  , scanResultRefinementResult :: RefinementResult
   , currentContext :: ScanResultContext
   }
 
@@ -96,6 +92,6 @@ initScanResult =
   ScanResult
     { scanResultTokens = Seq.empty
     , scanResultErrors = Seq.empty
-    , scanResultLast = NoResult
+    , scanResultRefinementResult = RefinementResult Seq.empty Nothing
     , currentContext = ScanResultContext{lineNumber = 1}
     }

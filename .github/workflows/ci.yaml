@@ -14,8 +14,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        ghc: ["9.12.2"]
-        cabal: ["3.0.0.0"]
+        ghc: ["9.6.7"]
+        cabal: ["3.12.1.0"]
         os: [ubuntu-latest]
         resolver: [lts]
         # exclude:

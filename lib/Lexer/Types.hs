@@ -1,7 +1,7 @@
 module Lexer.Types where
 
 import qualified Data.Sequence as Seq
-import Protolude (Eq, Int, Maybe (..), Show, Text)
+import Protolude (Char, Eq, Int, Maybe (..), Show, Text)
 
 data TokenType
   = -- Single-character tokens.
@@ -74,15 +74,28 @@ makeScanningError start end text =
     , scanningErrorText = text
     }
 
+data RefinementResult
+  = NoResult
+  | TokenResult Token
+  | ErrorResult ScanningError
+  | FurtherRefinement (Char -> RefinementResult)
+
+data ScanResultContext = ScanResultContext
+  { lineNumber :: Int
+  }
+
 data ScanResult = ScanResult
   { scanResultTokens :: Seq.Seq Token
   , scanResultErrors :: Seq.Seq ScanningError
+  , scanResultLast :: RefinementResult
+  , currentContext :: ScanResultContext
   }
-  deriving (Eq, Show)
 
 initScanResult :: ScanResult
 initScanResult =
   ScanResult
     { scanResultTokens = Seq.empty
     , scanResultErrors = Seq.empty
+    , scanResultLast = NoResult
+    , currentContext = ScanResultContext{lineNumber = 1}
     }
